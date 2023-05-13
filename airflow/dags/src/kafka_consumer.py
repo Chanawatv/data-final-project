@@ -4,8 +4,11 @@ import avro.schema
 import avro.io
 import io
 import os
+import pandas as pd
+import numpy as np
 
 def get_data():
+    df = pd.DataFrame()
     schema_file = os.getcwd()+"/dags/src/schema.avsc"
     schema = avro.schema.parse(open(schema_file).read())
 
@@ -27,5 +30,6 @@ def get_data():
     print('Running Consumer with AVRO')
     for message in consumer:
         print(message.value)
+        df = df.append(message.value, ignore_index= True)
 
     consumer.close()
