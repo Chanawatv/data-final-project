@@ -5,7 +5,7 @@ import avro.schema
 import avro.io
 import io
 import os
-import date
+from datetime import date, timedelta
 
 def serialize(schema, obj):
     bytes_writer = io.BytesIO()
@@ -50,12 +50,15 @@ def update_daily_data():
     limit = 1000
     offset = 0
 
-   # Get the current date
+    # Get the current date
     current_date = date.today()
 
+    # Calculate yesterday's date
+    yesterday = current_date - timedelta(days=1)
+
     # Format the current date as 'YYYY-MM-DD'
-    start = current_date.strftime('%Y-%m-%d')
-    end = current_date.strftime('%Y-%m-%d')
+    start = yesterday.strftime('%Y-%m-%d')
+    end = yesterday.strftime('%Y-%m-%d')
 
     producer = KafkaProducer(bootstrap_servers=[kafka_broker])
 
