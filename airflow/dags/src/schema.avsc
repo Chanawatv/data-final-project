@@ -1,0 +1,22 @@
+{
+    "namespace":"schema.avro",
+    "name":"schema",
+    "type":"record",
+    "fields":[
+        {"name": "type", "type": ["null", "string"]},
+        {"name": "org", "type": ["null", "string"]},
+        {"name": "description", "type": ["null", "string"]},
+        {"name": "ticket_id", "type": ["null", "string"]},
+        {"name": "coords", "type": {"type": "array", "items": "string"}},
+        {"name": "photo_url", "type": ["null", "string"]},
+        {"name": "after_photo", "type": ["null", "string"]},
+        {"name": "address", "type": ["null", "string"]},
+        {"name": "timestamp", "type": ["null", "string"]},
+        {"name": "problem_type_abdul", "type": {"type": "array", "items": "string"}},
+        {"name": "star", "type": ["null", "string"]},
+        {"name": "count_reopen", "type": ["null", "string"]},
+        {"name": "note", "type": ["null", "string"]},
+        {"name": "state", "type": ["null", "string"]},
+        {"name": "last_activity", "type": ["null", "string"]}
+    ]
+}
