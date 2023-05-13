@@ -19,7 +19,7 @@ def get_data():
         return reader.read(decoder)
 
     # Connect to kafka broker running in your local host (docker). Change this to your kafka broker if needed
-    kafka_broker = 'localhost:9092'
+    kafka_broker = 'kafka:9092'
 
     consumer = KafkaConsumer(
         'avro',
@@ -38,5 +38,3 @@ def get_data():
     # print(df)
     df.to_csv('./data/df.csv')  
     consumer.close()
-
-get_data()
