@@ -28,8 +28,15 @@ def get_data():
         value_deserializer=lambda x: deserialize(schema, x))
 
     print('Running Consumer with AVRO')
-    for message in consumer:
-        print(message.value)
-        df = df.append(message.value, ignore_index= True)
-
+    # for message in consumer:
+    #     print(message.value)
+    #     # df = df.append(message.value, ignore_index= True)
+    #     df = df._append(pd.Series(message.value,index=df.columns,name=len(df)))
+    
+    df = pd.DataFrame({'name':['Jeff','Rob'],'age':[21,22]})
+    df = df._append(pd.Series(['Nenenii',18],index=df.columns,name=len(df)))
+    print(df)
+    df.to_csv('./data/df.csv')  
     consumer.close()
+
+get_data()

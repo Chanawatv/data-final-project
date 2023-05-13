@@ -36,3 +36,5 @@ def load_init_data():
             producer.send('data', value=serialized_data)
         offset += 1000
     producer.close()
+
+load_init_data()
