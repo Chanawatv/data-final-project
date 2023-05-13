@@ -38,11 +38,6 @@ def load_init_data():
         offset += 1000
     producer.close()
 
-<<<<<<< HEAD
-load_init_data()
-=======
-
-    
 def update_daily_data():
     schema_file = os.getcwd()+"/dags/src/schema.avsc"
     schema = avro.schema.parse(open(schema_file).read())
@@ -76,4 +71,3 @@ def update_daily_data():
             producer.send('data', value=serialized_data)
         offset += 1000
     producer.close()
->>>>>>> 004337fb2f122ecda648c13f6d46a54baac49ad4
