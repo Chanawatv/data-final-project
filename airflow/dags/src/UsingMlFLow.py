@@ -1,10 +1,13 @@
 #Import the libraries
 import numpy as np
 import pandas as pd
+import datetime
+import joblib
+import csv
 
 df = pd.read_csv("./airflow/dags/src/data/rawOutlier.csv")
 # print(df.head(5))
-print(len(df['coords']))
+print(len(df))
 
 #import required modules
 import mlflow
@@ -15,20 +18,20 @@ import matplotlib.pyplot as plt
 # training_data=[(float(df['coords'][i][2:-2].split("', '")[1]),float(df['coords'][i][2:-2].split("', '")[0])) for i in range(len(df['coords']))]
 training_data = list(zip(df['latitude'], df['longitude']))
 
-# training_data = training_data[:2000]
 #create a new experiment
-experiment_name = 'ClusteringWithMlflow'
+now = datetime.datetime.now()
+experiment_name = 'ClusteringWithMlflow at {}'.format(now)
 try:
     exp_id = mlflow.create_experiment(name=experiment_name)
 except Exception as e:
     exp_id = mlflow.get_experiment_by_name(experiment_name).experiment_id
-
+    mlflow.delete_experiment(exp_id)
+    exp_id = mlflow.create_experiment(name=experiment_name)
 
 #run the code for different number of clusters
-range_of_k = range(30,76) 
+# range_of_k = range(5,1000) 
+range_of_k = [30,50,200,400,600,800]
 silhouette_scores = []
-
-
 
 for k in range_of_k :
     with mlflow.start_run(experiment_id=exp_id, run_name=f"Run with k = {k}"):
@@ -40,6 +43,7 @@ for k in range_of_k :
         mlflow.log_param('value_of_k', k)
         #save metric
         mlflow.log_metric('silhoutte_score', score)
+        print('run with k =',k,'score =',score)
         silhouette_scores.append(score)
        
         # ... code to perform clustering and compute silhouette score ...
@@ -62,20 +66,10 @@ for k in range_of_k :
         #end current run
         mlflow.end_run()
 
-
-
-# Plot the relationship between k and silhouette score
-# plt.plot(range_of_k, silhouette_scores, marker='o')
-# plt.xlabel('k')
-# plt.ylabel('Silhouette Score')
-# plt.title('Silhouette Score vs. k')
-# plt.grid(True)
-# plt.show()
-
 # Get the experiment ID
 experiment = mlflow.get_experiment_by_name(experiment_name)
 exp_id = experiment.experiment_id
-
+print(exp_id)
 # Get all runs in the experiment
 runs = mlflow.search_runs(experiment_ids=[exp_id])
 
@@ -83,9 +77,22 @@ runs = mlflow.search_runs(experiment_ids=[exp_id])
 sorted_runs = runs.sort_values(by='metrics.silhoutte_score', ascending=False)
 
 # Retrieve the best run and its details
-best_k = sorted_runs['params.value_of_k'].iloc[0]
+best_k = int(sorted_runs['params.value_of_k'].iloc[0])
 best_score = sorted_runs['metrics.silhoutte_score'].iloc[0]
 
 # Print the best run details
+runid = sorted_runs['run_id'].iloc[0]
+print('runid:',runid)
 print(f"Best Run - k: {best_k}, Silhouette Score: {best_score}")
 
+model = joblib.load('./mlruns/{}/{}/artifacts/Clustering_Model/model.pkl'.format(exp_id,runid))
+print(min(model.labels_))
+print(max(model.labels_))
+
+df['labels'] = model.labels_
+centroid = pd.DataFrame(data = model.cluster_centers_, columns= ['latitude','longitude'])
+index = [i for i in range(best_k)]
+centroid['Cluster'] = index
+centroid = centroid.reindex(columns=['Cluster', 'latitude', 'longitude'])
+centroid.to_csv('./airflow/dags/src/data/centroid.csv', index=False)
+df.to_csv('./airflow/dags/src/data/labeled.csv', index=False)
