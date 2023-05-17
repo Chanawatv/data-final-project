@@ -18,7 +18,7 @@ def get_init_data(**kwargs):
     limit = 1000
     offset = 0
     end = get_yesterday()
-    start = end - timedelta(days = 30)
+    start = end - timedelta(days = 60)
     df = []
 
     set_info = get_data_set(limit, offset, start, end)
