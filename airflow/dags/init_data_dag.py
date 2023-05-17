@@ -3,6 +3,9 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 
 from src.get_data import get_init_data
+from src.clean_data import clean_data
+
+PATH_DATA = "/data"
 
 args = {
     'owner': 'airflow',
@@ -17,10 +20,18 @@ dag = DAG(
 	catchup=False,
 )
 
-task = PythonOperator(
+task1 = PythonOperator(
     task_id='get_init_data',
     python_callable=get_init_data,
-    dag=dag
+    dag=dag,
+    op_kwargs={'path_data': PATH_DATA}
 )
 
-task
+task2 = PythonOperator(
+    task_id='clean_data',
+    python_callable=clean_data,
+    dag=dag,
+    op_kwargs={'path_data': PATH_DATA}
+)
+
+task1 >> task2
