@@ -29,8 +29,9 @@ except Exception as e:
     exp_id = mlflow.create_experiment(name=experiment_name)
 
 #run the code for different number of clusters
-# range_of_k = range(5,1000) 
-range_of_k = [30,50,200,400,600,800]
+range_of_k = range(20,80,5)
+m = 1.01
+# range_of_k = [30,50]
 silhouette_scores = []
 
 for k in range_of_k :
@@ -64,6 +65,8 @@ for k in range_of_k :
         #save model
         mlflow.sklearn.log_model(trained_model, "Clustering_Model")
         #end current run
+        if k>30 and silhouette_scores[-1] < silhouette_scores[-2]*m and silhouette_scores[-2] < silhouette_scores[-3]*m:
+            break
         mlflow.end_run()
 
 # Get the experiment ID
