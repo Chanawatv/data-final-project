@@ -30,7 +30,7 @@ except Exception as e:
 
 #run the code for different number of clusters
 range_of_k = range(20,80,5)
-m = 1.01
+m = 1.005
 # range_of_k = [30,50]
 silhouette_scores = []
 
